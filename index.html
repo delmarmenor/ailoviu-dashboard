@@ -165,12 +165,31 @@ cDem=new Chart(el.getContext("2d"),{type:"line",data:{labels:lb,datasets:ds},opt
 window.onS=function(v){curSeason=v;applyFilters()};
 window.onE=function(v){curEmision=v;applyFilters()};
 window.onD=function(v){curDemo=v;applyFilters()};
+
+function parseCSVLine(line) {
+  var result = [], current = "", inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    var c = line[i];
+    if (inQuotes) {
+      if (c === '"' && line[i + 1] === '"') { current += '"'; i++; }
+      else if (c === '"') { inQuotes = false; }
+      else { current += c; }
+    } else {
+      if (c === '"') { inQuotes = true; }
+      else if (c === ',') { result.push(current.trim()); current = ""; }
+      else { current += c; }
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
+
 function loadData(){showLoad();
 fetch(DATA_URL).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.text()}).then(function(text){
 var lines=text.split("\n").filter(function(l){return l.trim()});
 if(lines.length<2){showErr("Sin datos");return}
-var hdr=lines[0].split(",").map(function(h){return h.trim()});
-var rows=[];for(var i=1;i<lines.length;i++){var vals=lines[i].split(",").map(function(v){return v.trim()});var row={};for(var j=0;j<hdr.length;j++)row[hdr[j]]=vals[j]||"";rows.push(row)}
+var hdr=parseCSVLine(lines[0]);
+var rows=[];for(var i=1;i<lines.length;i++){var vals=parseCSVLine(lines[i]);var row={};for(var j=0;j<hdr.length;j++)row[hdr[j]]=vals[j]||"";rows.push(row)}
 rawCount=rows.length;allData=proc(rows);
 var seen={};for(var i=0;i<allData.length;i++)seen[allData[i].season]=true;
 allSeasons=Object.keys(seen).sort();loadTs=new Date();curSeason="all";curEmision="ORIGINAL";curDemo="none";applyFilters()}).catch(function(e){showErr(e.message)})}
