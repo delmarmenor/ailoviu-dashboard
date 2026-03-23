@@ -87,11 +87,11 @@ function proc(rows){var r=[];for(var i=0;i<rows.length;i++){var x=rows[i];var da
 r.push({date:date,share:nm(x.SHARE),shareCad:nm(x["SHARE CADENA"]),aud:nm(x["AUDIENCIA MEDIA"]),mc:nm(x["MURCIA CONECTA"]),
 hom:nm(x["SAHRE HOMBRES"]),muj:nm(x.MUJERES),nin:nm(x["NIÑOS"])||nm(x.NINOS),jov:nm(x.JOVENES),ad1:nm(x.ADULT1),ad2:nm(x.ADULT2),may:nm(x.MAYORES),
 h10:nm(x["-10MIL"])||nm(x["-10 MIL"]),h50:nm(x["10-50 MIL"])||nm(x["10-50MIL"]),h200:nm(x["50-200 MIL"])||nm(x["50-200MIL"]),h200p:nm(x["200M"]),
-nP:x["Nº PROGRAMA"],nA:x["Nº ABSOLUTO"],em:(x.EMISION||x["EMISIÓN"]||"").toUpperCase().trim(),season:ssn(date),mk:date.getFullYear()+"-"+("0"+(date.getMonth()+1)).slice(-2)})}
+nP:x["Nº PROGRAMA"],nA:x["Nº ABSOLUTO"],em:(x.EMISION||x["EMISIÓN"]||"").toUpperCase().trim(),type:(x.TIPO||"").toUpperCase().trim(),season:ssn(date),mk:date.getFullYear()+"-"+("0"+(date.getMonth()+1)).slice(-2)})}
 r.sort(function(a,b){return a.date-b.date});return r}
 
 function applyFilters(){var d=allData;
-if(curEmision==="ORIGINAL")d=d.filter(function(x){return x.em==="ORIGINAL"||x.em==="SI"});
+if(curEmision==="ORIGINAL")d=d.filter(function(x){return x.type==="ORIGINAL"});
 if(curSeason==="mes"){var now=new Date(),mk=now.getFullYear()+"-"+("0"+(now.getMonth()+1)).slice(-2);d=d.filter(function(x){return x.mk===mk})}
 else if(curSeason==="last10")d=d.slice(-10);
 else if(curSeason!=="all")d=d.filter(function(x){return x.season===curSeason});
