@@ -1,0 +1,12 @@
+export default async function handler(req, res) {
+  const url = "https://script.google.com/macros/s/AKfycbyFHG7Q1a9_KWtsjv03TozFx2OyXGtxCn76-MmCeMf_J8F7yYTgYENrfvqTm8bJNsE/exec?mode=data";
+  try {
+    const r = await fetch(url, { redirect: "follow" });
+    const text = await r.text();
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Content-Type", "application/json");
+    res.status(200).send(text);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+}
