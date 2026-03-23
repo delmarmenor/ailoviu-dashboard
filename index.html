@@ -174,3 +174,7 @@ var rows=[];for(var i=1;i<lines.length;i++){var vals=lines[i].split(",").map(fun
 rawCount=rows.length;allData=proc(rows);
 var seen={};for(var i=0;i<allData.length;i++)seen[allData[i].season]=true;
 allSeasons=Object.keys(seen).sort();loadTs=new Date();curSeason="all";curEmision="ORIGINAL";curDemo="none";applyFilters()}).catch(function(e){showErr(e.message)})}
+loadData();
+</script>
+</body>
+</html>
