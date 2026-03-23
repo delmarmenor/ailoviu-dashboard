@@ -18,7 +18,7 @@ body::after{content:'';position:fixed;bottom:-10%;left:-8%;width:40vw;height:40v
 .gl{background:var(--bgs);backdrop-filter:blur(var(--blur));-webkit-backdrop-filter:blur(var(--blur));border:1px solid var(--gb);border-radius:var(--r);padding:24px;transition:border-color .3s}
 .gl:hover{border-color:rgba(255,255,255,0.12)}
 .hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
-.logo{font-size:32px;font-weight:900;letter-spacing:-1px;background:linear-gradient(100deg,#f0eeff 20%,var(--v) 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo{font-size:32px;font-weight:900;letter-spacing:-1px;background:linear-gradient(100deg,#f0eeff 20%,var(--v) 80%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .sub{font-size:10px;color:var(--t3);letter-spacing:4px;text-transform:uppercase;font-weight:600;margin-top:4px}
 .hr{display:flex;align-items:center;gap:12px}
 .mta{font-family:var(--m);font-size:9px;color:var(--t4)}
@@ -59,18 +59,6 @@ select.fsel option{background:#1a1035;color:var(--t1)}
 .dtb th:first-child{text-align:left}
 .dtb td{padding:6px;border-top:1px solid rgba(255,255,255,0.025);text-align:right}
 .dtb td:first-child{color:var(--t2);text-align:left}
-.ap{position:relative;overflow:hidden}
-.ah{display:flex;align-items:center;gap:12px;margin-bottom:18px}
-.aico{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--v),#7c3aed);font-size:16px}
-.atit{font-size:14px;font-weight:700;color:#e2e0ff}
-.asub{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:2px}
-.bai{width:100%;padding:16px;border-radius:14px;border:1px solid rgba(167,139,250,0.2);background:linear-gradient(135deg,rgba(167,139,250,0.1),rgba(124,58,237,0.06));color:#c4b5fd;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--f);transition:all .25s}
-.bai:hover{background:linear-gradient(135deg,rgba(167,139,250,0.2),rgba(124,58,237,0.12))}
-.brg{margin-top:16px;padding:8px 18px;border-radius:10px;border:1px solid var(--gb);background:var(--bgs);color:var(--t3);font-size:10px;cursor:pointer;font-family:var(--f);font-weight:600}
-.aout{font-size:13px;line-height:1.8;color:rgba(255,255,255,0.7);white-space:pre-line}
-.ald{text-align:center;padding:32px;color:var(--t3)}
-.pls{animation:pls 1.4s infinite}
-@keyframes pls{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.92)}}
 .ft{text-align:center;margin-top:28px;padding-bottom:18px;font-family:var(--m);font-size:9px;color:var(--t4);letter-spacing:3px}
 .ls{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
 .fi{opacity:0;transform:translateY(16px);animation:fu .5s forwards}
@@ -143,7 +131,6 @@ app.innerHTML='<div class="hd fi"><div><div class="logo">AILOVIU</div><div class
 '<div class="gl fc fi" style="animation-delay:.2s"><div class="ctit">AILOVIU vs Murcia Conecta vs Cadena</div><canvas id="cD"></canvas></div>'+
 (curDemo!=="none"?'<div class="gl fc fi" style="animation-delay:.22s"><div class="ctit" id="demT"></div><canvas id="cDem"></canvas></div>':'')+
 '<div class="bg3 fi" style="animation-delay:.25s"><div class="gl"><div class="sl">🏆 Top 10 Emisiones</div>'+tH+'<div class="sl mt2">📉 5 Peores</div>'+bH+'</div><div class="gl"><div class="sl">📅 Top 10 Meses</div>'+mH+'</div><div class="gl"><div class="sl">📋 Últimas 10</div><div style="overflow-x:auto"><table class="dtb"><thead><tr><th style="text-align:left">Fecha</th><th>Share</th><th>Cadena</th><th>Aud.</th><th>M.C.</th><th>Nº</th></tr></thead><tbody>'+rH+'</tbody></table></div></div></div>'+
-'<div class="gl ap fi" style="animation-delay:.3s"><div class="ah"><div class="aico">🧠</div><div><div class="atit">Análisis IA</div><div class="asub">Powered by Claude</div></div></div><div id="aiC"><button class="bai" onclick="runAI()">✨ Analizar audiencias con IA</button></div></div>'+
 '<div class="ft fi" style="animation-delay:.35s">AILOVIU · La 7 TV · Región de Murcia · Datos en directo</div>';
 renderCharts(d);if(curDemo!=="none")renderDemo(d)}
 
@@ -178,15 +165,6 @@ cDem=new Chart(el.getContext("2d"),{type:"line",data:{labels:lb,datasets:ds},opt
 window.onS=function(v){curSeason=v;applyFilters()};
 window.onE=function(v){curEmision=v;applyFilters()};
 window.onD=function(v){curDemo=v;applyFilters()};
-
-window.runAI=function(){var el=document.getElementById("aiC");if(!el)return;
-el.innerHTML='<div class="ald"><div style="font-size:24px" class="pls">🧠</div><div style="font-size:12px;margin-top:10px">Analizando '+filtData.length+' emisiones...</div></div>';
-var l=filtData.slice(-30),sm={total:filtData.length,temporada:curSeason,emision:curEmision,
-u30:l.map(function(d){return{f:fmt(d.date),sh:d.share,cad:d.shareCad,au:d.aud,mc:d.mc}}),
-avg:{share:avg(filtData.map(function(d){return d.share})).toFixed(1),cadena:avg(filtData.map(function(d){return d.shareCad})).toFixed(1),aud:avg(filtData.map(function(d){return d.aud})).toFixed(0),mc:avg(filtData.map(function(d){return d.mc})).toFixed(1)},
-max:mx(filtData.map(function(d){return d.share}))};
-fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({data:sm})}).then(function(r){return r.json()}).then(function(j){var t=j.text||"";if(!t&&j.error)t="Error del sistema: "+j.error;if(!t)t="Sin respuesta";el.innerHTML='<div class="aout">'+t+'</div><button class="brg" onclick="runAI()">🔄 Regenerar</button>'}).catch(function(e){el.innerHTML='<div class="aout" style="color:var(--rd)">Error crítico: '+e.message+'</div><button class="brg" onclick="runAI()">🔄 Reintentar</button>'})};
-
 function loadData(){showLoad();
 fetch(DATA_URL).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.text()}).then(function(text){
 var lines=text.split("\n").filter(function(l){return l.trim()});
