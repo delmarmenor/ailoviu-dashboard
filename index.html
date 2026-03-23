@@ -81,7 +81,7 @@ select.fsel option{background:#1a1035;color:var(--t1)}
 <body>
 <div class="ct" id="app"></div>
 <script>
-var DATA_URL="/api/data";
+var DATA_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTFnGpi3GGm5Xa3FwAyU8FjId8eNWxChOjD_YwaClkIDZjIx5xeUsgSldncNaXVpQ3P0Fl1tEFj7jcS/pub?gid=0&single=true&output=csv";
 var app=document.getElementById("app");
 var allData=[],filtData=[],allSeasons=[],curSeason="all",curEmision="ORIGINAL",curDemo="none",rawCount=0,loadTs=null;
 var cS=null,cA=null,cD=null,cDem=null;
@@ -185,14 +185,14 @@ var l=filtData.slice(-30),sm={total:filtData.length,temporada:curSeason,emision:
 u30:l.map(function(d){return{f:fmt(d.date),sh:d.share,cad:d.shareCad,au:d.aud,mc:d.mc}}),
 avg:{share:avg(filtData.map(function(d){return d.share})).toFixed(1),cadena:avg(filtData.map(function(d){return d.shareCad})).toFixed(1),aud:avg(filtData.map(function(d){return d.aud})).toFixed(0),mc:avg(filtData.map(function(d){return d.mc})).toFixed(1)},
 max:mx(filtData.map(function(d){return d.share}))};
-fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:"Eres analista de audiencias de TV regional española. Analiza datos de AILOVIU en La 7 TV Murcia.\n\nDATOS:\n"+JSON.stringify(sm)+"\n\nAnaliza max 200 palabras en español:\n1. Tendencia del share y comparación con media de la cadena\n2. Comparativa con Murcia Conecta\n3. Dato destacado\n4. Recomendación\n\nSé directo, cifras concretas. Sin markdown."}]})}).then(function(r){return r.json()}).then(function(j){var t="";if(j.content)for(var k=0;k<j.content.length;k++){if(j.content[k].text)t+=j.content[k].text}if(!t&&j.error)t="Error: "+j.error.message;if(!t)t="Sin respuesta";el.innerHTML='<div class="aout">'+t+'</div><button class="brg" onclick="runAI()">🔄 Regenerar</button>'}).catch(function(e){el.innerHTML='<div class="aout" style="color:var(--rd)">Error: '+e.message+'</div><button class="brg" onclick="runAI()">🔄 Reintentar</button>'})};
+fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({data:sm})}).then(function(r){return r.json()}).then(function(j){var t=j.text||"";if(!t&&j.error)t="Error del sistema: "+j.error;if(!t)t="Sin respuesta";el.innerHTML='<div class="aout">'+t+'</div><button class="brg" onclick="runAI()">🔄 Regenerar</button>'}).catch(function(e){el.innerHTML='<div class="aout" style="color:var(--rd)">Error crítico: '+e.message+'</div><button class="brg" onclick="runAI()">🔄 Reintentar</button>'})};
 
 function loadData(){showLoad();
-fetch(DATA_URL).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(function(j){
-rawCount=(j.data||[]).length;allData=proc(j.data||[]);
+fetch(DATA_URL).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.text()}).then(function(text){
+var lines=text.split("\n").filter(function(l){return l.trim()});
+if(lines.length<2){showErr("Sin datos");return}
+var hdr=lines[0].split(",").map(function(h){return h.trim()});
+var rows=[];for(var i=1;i<lines.length;i++){var vals=lines[i].split(",").map(function(v){return v.trim()});var row={};for(var j=0;j<hdr.length;j++)row[hdr[j]]=vals[j]||"";rows.push(row)}
+rawCount=rows.length;allData=proc(rows);
 var seen={};for(var i=0;i<allData.length;i++)seen[allData[i].season]=true;
 allSeasons=Object.keys(seen).sort();loadTs=new Date();curSeason="all";curEmision="ORIGINAL";curDemo="none";applyFilters()}).catch(function(e){showErr(e.message)})}
-loadData();
-</script>
-</body>
-</html>
