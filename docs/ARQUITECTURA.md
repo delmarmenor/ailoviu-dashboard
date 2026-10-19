@@ -26,6 +26,9 @@ Dashboard (index.html en Vercel)  ── filtro por defecto "Originales" = AA ==
 | `api/data.js` | Endpoint de Vercel que devuelve el CSV en JSON. El `index.html` actual **no lo usa** (lee el CSV directamente). |
 | `.agent/workflows/despliegue.md` | Pasos de despliegue: un push a `main` despliega en Vercel. |
 
+- Web publicada: **https://project-4b0bi.vercel.app** (proyecto `project-4b0bi` de Vercel).
+- El repositorio también está conectado a los proyectos de Vercel `archivos` y `web_happys`, que se despliegan con cada push. Revisar si sobran.
+
 - Temporadas: empiezan en septiembre (`ssn()`): T1 = 22/23 … T5 = 26/27.
 - El filtro "Originales" depende **solo** de la columna AA (TIPO) de la hoja. Si una emisión no aparece, casi siempre es porque le falta el Nº PROGRAMA en la hoja, no por el dashboard.
 - Por decisión del usuario, el dashboard no usa IA.

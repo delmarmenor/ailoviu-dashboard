@@ -14,7 +14,7 @@ Sigue estos pasos para aplicar cambios en el dashboard y que se reflejen en Verc
 4.  **Desplegar**:
     // turbo
     Sube los cambios a la rama principal: `git push origin main`
-5.  **Verificar**: Espera 20 segundos y visita `https://ailoviu-dashboard.vercel.app` (o el dominio configurado).
+5.  **Verificar**: Espera 20 segundos y visita `https://project-4b0bi.vercel.app` (dirección estable del proyecto `project-4b0bi` en Vercel).
 
 ### Notas sobre la IA
 Este proyecto **NO** utiliza IA en el frontend por decisión del usuario. No intentes re-activar funciones de Claude/Anthropic sin confirmación explícita, ya que el usuario prefiere un panel puramente estadístico.

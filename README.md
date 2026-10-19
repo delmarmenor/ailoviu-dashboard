@@ -23,6 +23,9 @@ Este proyecto está configurado para desplegarse automáticamente al hacer "push
 ### Repositorio
 `https://github.com/delmarmenor/ailoviu-dashboard`
 
+### Web publicada
+`https://project-4b0bi.vercel.app` (proyecto `project-4b0bi` en Vercel). Las direcciones con un código en medio (`project-4b0bi-xxxxxxx-….vercel.app`) son de un despliegue concreto, se quedan fijas en esa versión y piden iniciar sesión en Vercel.
+
 ### Pasos para actualizar:
 1. Realiza tus cambios localmente.
 2. Ejecuta los comandos en tu terminal:
