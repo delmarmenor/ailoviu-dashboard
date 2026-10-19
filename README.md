@@ -3,12 +3,14 @@
 Este es el panel interactivo de audiencias para el programa **AILOVIU** de La 7 TV (Murcia). Los datos se consumen en tiempo real directamente desde un Google Sheet publicado como CSV.
 
 ## 📊 Características
-- **Gráficos Dinámicos**: Evolución de share y audiencia acumulada (usando Chart.js).
-- **Filtrado Avanzado**: 
-  - Por temporada.
-  - Por tipo de emisión (**Columna AA - TIPO**): "Original" vs "Todos".
-- **KPIs Automáticos**: Cálculo de share medio, máximos, audiencia media y comparativa con el último dato.
-- **Top 10**: Listas automáticas de las mejores emisiones y los mejores meses de la historia del programa.
+- **Filtros**: periodo (temporada, mes en curso, últimos 10) y tipo de emisión (**Columna AA - TIPO**): "Originales" vs "Todas".
+- **KPIs**: share medio, diferencia con la cadena, audiencia media, emisiones y último programa; con una temporada elegida, comparan con la anterior.
+- **Evolución**: share y audiencia con media móvil de 10 emisiones (y cada emisión como punto); diferencia mensual AILOVIU − cadena.
+- **Comparativa de temporadas**: temporada contra temporada por nº de emisión, resumen por temporada y originales frente a repeticiones.
+- **Cuándo funciona mejor**: mapa de calor mes × día de la semana y perfil de audiencia (sexo, edad, tamaño del municipio).
+- **Localidades**: ranking de share por localidad de grabación (columna PUBLICO).
+- **Competencia**: AILOVIU frente a Murcia Conecta (solo emisiones con dato).
+- **Rankings**: mejores y peores emisiones, mejores meses y últimas 10 emisiones.
 
 ## ⚙️ Estructura Técnica
 - **index.html**: Contiene toda la lógica del frontend, estilos y motor de gráficos.
@@ -30,6 +32,9 @@ Este proyecto está configurado para desplegarse automáticamente al hacer "push
    git push origin main
    ```
 3. Vercel detectará el cambio y actualizará la web en unos segundos.
+
+## 🧭 Arquitectura completa
+Los datos de la hoja los genera un Google Apps Script que **no está en este repositorio**. Ver [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) para el flujo Gmail → Apps Script → Sheet → dashboard, el mantenimiento por temporada y el registro de cambios.
 
 ## 📝 Notas sobre los Datos
 - **Fuente**: [Google Sheets - Publicado como CSV](https://docs.google.com/spreadsheets/d/e/2PACX-1vTFnGpi3GGm5Xa3FwAyU8FjId8eNWxChOjD_YwaClkIDZjIx5xeUsgSldncNaXVpQ3P0Fl1tEFj7jcS/pub?gid=0&single=true&output=csv).

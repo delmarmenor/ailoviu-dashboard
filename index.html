@@ -6,183 +6,366 @@
 <title>AILOVIU · Dashboard de Audiencias</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📺</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
-:root{--bg1:#080515;--bg2:#110d24;--bgs:rgba(255,255,255,0.045);--gb:rgba(255,255,255,0.07);--blur:28px;--v:#a78bfa;--vd:rgba(167,139,250,0.15);--vg:rgba(167,139,250,0.06);--cy:#38bdf8;--gn:#4ade80;--am:#fbbf24;--or:#fb923c;--rd:#f87171;--pk:#f472b6;--t1:#eeedf5;--t2:rgba(255,255,255,0.55);--t3:rgba(255,255,255,0.3);--t4:rgba(255,255,255,0.15);--r:20px;--f:'Outfit',sans-serif;--m:'JetBrains Mono',monospace}
+:root{
+  --bg1:#080515;--bg2:#110d24;--card:rgba(255,255,255,0.045);--line:rgba(255,255,255,0.08);--grid:rgba(255,255,255,0.06);
+  --t1:#eeedf5;--t2:rgba(238,237,245,0.72);--t3:rgba(238,237,245,0.52);
+  /* Roles de datos (validados sobre la superficie oscura) */
+  --s1:#3987e5;   /* AILOVIU / temporada actual */
+  --s2:#d95926;   /* Murcia Conecta / temporada anterior */
+  --ctx:#7d7f8c;  /* contexto: cadena, temporadas antiguas, repeticiones */
+  --neg:#e66767;  /* por debajo de la cadena */
+  --good:#0ca30c;--bad:#d03b3b;
+  --brand:#a78bfa;
+  --r:18px;--f:'Outfit',system-ui,sans-serif;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--f);background:linear-gradient(155deg,var(--bg1),var(--bg2) 45%,#0a0718);color:var(--t1);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;top:-15%;right:-10%;width:55vw;height:55vw;border-radius:50%;background:radial-gradient(circle,var(--vg),transparent 65%);pointer-events:none;z-index:0}
-body::after{content:'';position:fixed;bottom:-10%;left:-8%;width:40vw;height:40vw;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,0.03),transparent 60%);pointer-events:none;z-index:0}
-.ct{max-width:1160px;margin:0 auto;padding:28px 22px;position:relative;z-index:1}
-.gl{background:var(--bgs);backdrop-filter:blur(var(--blur));-webkit-backdrop-filter:blur(var(--blur));border:1px solid var(--gb);border-radius:var(--r);padding:24px;transition:border-color .3s}
-.gl:hover{border-color:rgba(255,255,255,0.12)}
+body{font-family:var(--f);background:linear-gradient(155deg,var(--bg1),var(--bg2) 45%,#0a0718);background-color:var(--bg1);color:var(--t1);min-height:100vh;overflow-x:hidden;font-size:14px}
+.ct{max-width:1180px;margin:0 auto;padding:28px 22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;min-width:0}
 .hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
-.logo{font-size:32px;font-weight:900;letter-spacing:-1px;background:linear-gradient(100deg,#f0eeff 20%,var(--v) 80%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.sub{font-size:10px;color:var(--t3);letter-spacing:4px;text-transform:uppercase;font-weight:600;margin-top:4px}
-.hr{display:flex;align-items:center;gap:12px}
-.mta{font-family:var(--m);font-size:9px;color:var(--t4)}
-.br{padding:8px 16px;border-radius:12px;border:1px solid var(--gb);background:var(--bgs);color:var(--t2);font-size:11px;font-weight:600;font-family:var(--f);cursor:pointer;transition:all .2s}
-.br:hover{background:rgba(255,255,255,0.08);color:var(--t1)}
-.filters{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;align-items:flex-end}
-.fgroup{display:flex;flex-direction:column;gap:4px}
-.flabel{font-size:8px;text-transform:uppercase;letter-spacing:2px;color:var(--t3);font-weight:700}
-select.fsel{padding:7px 14px;border-radius:12px;border:1px solid var(--gb);background:rgba(255,255,255,0.06);color:var(--t1);font-size:12px;font-weight:600;font-family:var(--f);cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;min-width:160px}
-select.fsel:focus{outline:none;border-color:rgba(167,139,250,0.5)}
-select.fsel option{background:#1a1035;color:var(--t1)}
-.toggle-wrap{display:flex;border-radius:12px;overflow:hidden;border:1px solid var(--gb)}
-.tog{padding:7px 16px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--f);border:none;transition:all .2s;letter-spacing:.5px}
-.tog.off{background:rgba(255,255,255,0.03);color:var(--t3)}
-.tog.on{background:var(--vd);color:#c4b5fd}
-.tog:hover{background:rgba(255,255,255,0.08)}
-.kpis{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
-.kpi{flex:1 1 180px;min-width:150px;text-align:center;padding:20px 12px}
-.kl{font-size:8px;text-transform:uppercase;letter-spacing:2.5px;color:var(--t3);margin-bottom:8px;font-weight:700}
-.kv{font-size:38px;font-weight:900;line-height:1}
-.ku{font-size:14px;font-weight:400;opacity:.5}
-.ks{font-size:10px;color:var(--t4);margin-top:6px}
-.kt{font-size:11px;margin-top:6px;font-weight:700;font-family:var(--m)}
-.up{color:var(--gn)}.dn{color:var(--rd)}
-.crow{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px;margin-bottom:20px}
-.ctit{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:3px;margin-bottom:14px}
-.fc{margin-bottom:20px}
-.bg3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:20px}
-.ri{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.035)}
+.logo{font-size:32px;font-weight:900;letter-spacing:-1px;background:linear-gradient(100deg,#f0eeff 20%,var(--brand) 80%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{font-size:12px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-top:4px}
+.hr{display:flex;align-items:center;gap:12px;color:var(--t3);font-size:12px}
+.btn{padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--t2);font:600 13px var(--f);cursor:pointer}
+.btn:hover{background:rgba(255,255,255,0.09);color:var(--t1)}
+.filters{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;align-items:flex-end}
+.fgroup{display:flex;flex-direction:column;gap:5px}
+.flabel{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);font-weight:700}
+select.fsel{padding:8px 34px 8px 14px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,0.06) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.5)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E") no-repeat right 12px center;color:var(--t1);font:600 14px var(--f);cursor:pointer;appearance:none;-webkit-appearance:none}
+select.fsel option{background:#1a1035}
+.seg{display:flex;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.seg button{padding:8px 16px;font:700 13px var(--f);border:none;cursor:pointer;background:rgba(255,255,255,0.03);color:var(--t3)}
+.seg button.on{background:rgba(57,135,229,0.22);color:var(--t1)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
+.kpi{padding:18px}
+.kl{font-size:12px;color:var(--t3);font-weight:600;margin-bottom:8px}
+.kv{font-size:36px;font-weight:800;line-height:1.05}
+.ku{font-size:16px;font-weight:500;color:var(--t3);margin-left:2px}
+.ks{font-size:12px;color:var(--t3);margin-top:6px}
+.dl{font-size:13px;font-weight:700;margin-top:6px}
+.dl.up{color:var(--good)}.dl.dn{color:var(--bad)}.dl.eq{color:var(--t3)}
+.sec{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin:30px 0 12px}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:14px}
+.mb{margin-bottom:14px}
+.ctit{font-size:16px;font-weight:700;margin-bottom:4px}
+.cnote{font-size:12px;color:var(--t3);margin-bottom:14px}
+.cbox{position:relative;height:280px}
+.cbox.tall{height:340px}
+/* Tablas */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.tbl th{padding:8px;text-align:right;color:var(--t3);font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:8px;text-align:right;border-bottom:1px solid rgba(255,255,255,0.04);white-space:nowrap}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl tr.cur td{background:rgba(57,135,229,0.10)}
+.tbl td.bar{width:38%;min-width:120px}
+.scroll{overflow-x:auto}
+.hb{display:flex;align-items:center;gap:8px}
+.hb .tr{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,0.05);position:relative}
+.hb .fl{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--s1)}
+.hb .vv{min-width:44px;text-align:right}
+.pos{color:var(--good)}.neg{color:var(--bad)}
+/* Perfil de audiencia */
+.prow{display:grid;grid-template-columns:150px 1fr 52px;align-items:center;gap:10px;padding:6px 0;font-size:13px}
+.prow .pl{color:var(--t2)}
+.prow .tr{height:12px;border-radius:0 4px 4px 0;background:rgba(255,255,255,0.04);position:relative}
+.prow .fl{position:absolute;left:0;top:0;bottom:0;border-radius:0 4px 4px 0;background:var(--s1)}
+.prow .ref{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--t1);opacity:.7}
+.prow .pv{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--t2);margin-top:10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.legend i.tick{width:2px;height:14px;border-radius:0;background:var(--t1)}
+/* Mapa de calor */
+.heat{display:grid;grid-template-columns:56px repeat(5,1fr);gap:3px;font-size:13px}
+.heat .hh{color:var(--t3);font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:700;text-align:center;padding:4px 0}
+.heat .hm{color:var(--t2);display:flex;align-items:center}
+.heat .hc{border-radius:4px;text-align:center;padding:9px 0;font-weight:700;font-variant-numeric:tabular-nums;cursor:default}
+.heat .hc.empty{background:rgba(255,255,255,0.03);color:var(--t3);font-weight:400}
+.scale{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t3);margin-top:12px}
+.scale .sb{flex:0 0 140px;height:8px;border-radius:4px}
+/* Rankings */
+.ri{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px}
 .ri:last-child{border-bottom:none}
-.rn{font-family:var(--m);font-weight:800;width:24px;text-align:center}
-.rdt{font-size:11px;color:var(--t2);margin-left:8px}
-.rv{font-family:var(--m);font-size:14px;font-weight:700}
-.sl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:3px;margin-bottom:12px}
-.mt2{margin-top:22px}
-.dtb{width:100%;border-collapse:collapse;font-family:var(--m);font-size:10px}
-.dtb th{padding:5px 6px;text-align:right;color:var(--t3);font-size:7px;text-transform:uppercase;letter-spacing:1px;font-weight:600}
-.dtb th:first-child{text-align:left}
-.dtb td{padding:6px;border-top:1px solid rgba(255,255,255,0.025);text-align:right}
-.dtb td:first-child{color:var(--t2);text-align:left}
-.ft{text-align:center;margin-top:28px;padding-bottom:18px;font-family:var(--m);font-size:9px;color:var(--t4);letter-spacing:3px}
-.ls{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
-.fi{opacity:0;transform:translateY(16px);animation:fu .5s forwards}
-@keyframes fu{to{opacity:1;transform:translateY(0)}}
-@media(max-width:768px){.ct{padding:16px 12px}.kv{font-size:28px}.logo{font-size:24px}.crow,.bg3{grid-template-columns:1fr}.filters{flex-direction:column;align-items:stretch}}
+.rn{font-weight:800;width:26px;color:var(--t3);font-variant-numeric:tabular-nums}
+.rd{color:var(--t2);flex:1}
+.rv{font-weight:700;font-variant-numeric:tabular-nums}
+.sl{font-size:16px;font-weight:700;margin-bottom:10px}
+.sl.mt{margin-top:22px}
+.more{margin-top:12px}
+.ft{text-align:center;margin-top:30px;padding-bottom:18px;font-size:12px;color:var(--t3)}
+.ls{min-height:80vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center}
+#tip{position:fixed;z-index:50;pointer-events:none;background:rgba(15,10,30,0.96);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.45;color:var(--t1);max-width:260px;opacity:0;transition:opacity .1s}
+@media(max-width:768px){
+  .ct{padding:16px}.kv{font-size:28px}.logo{font-size:24px}
+  .g2,.g3{grid-template-columns:1fr}
+  .filters{flex-direction:column;align-items:stretch}
+  .cbox{height:240px}.cbox.tall{height:280px}
+  .prow{grid-template-columns:110px 1fr 46px}
+}
 </style>
 </head>
 <body>
 <div class="ct" id="app"></div>
+<div id="tip"></div>
 <script>
 var DATA_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTFnGpi3GGm5Xa3FwAyU8FjId8eNWxChOjD_YwaClkIDZjIx5xeUsgSldncNaXVpQ3P0Fl1tEFj7jcS/pub?gid=0&single=true&output=csv";
 var app=document.getElementById("app");
-var allData=[],filtData=[],allSeasons=[],curSeason="all",curEmision="ORIGINAL",curDemo="none",rawCount=0,loadTs=null;
-var cS=null,cA=null,cD=null,cDem=null;
+var allData=[],filtData=[],allSeasons=[],curSeason="all",curEmision="ORIGINAL",rawCount=0,loadTs=null,showAllLoc=false;
+var charts=[];
 var MESES=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+var DIAS=["dom","lun","mar","mié","jue","vie","sáb"];
+var MA_N=10; // media móvil: nº de emisiones
+var C={s1:"#3987e5",s2:"#d95926",ctx:"#7d7f8c",neg:"#e66767",t2:"rgba(238,237,245,0.72)",t3:"rgba(238,237,245,0.52)",grid:"rgba(255,255,255,0.06)"};
 
+/* ───────── Parseo ───────── */
 function parseDate(s){if(!s)return null;var c=s.replace(/^[a-záéíóúü]+\//i,"").trim().split("/").map(function(x){return x.trim()});if(c.length<3)return null;var d=parseInt(c[0],10),m=parseInt(c[1],10)-1,y=parseInt(c[2],10);if(y<100)y+=2000;var dt=new Date(y,m,d);return isNaN(dt.getTime())?null:dt}
 function nm(v){if(v==null||v===""||v==="x"||v==="X"||v==="00")return null;var n=parseFloat(String(v).replace(",","."));return isNaN(n)?null:n}
-function fmt(d){return d?d.toLocaleDateString("es-ES",{day:"2-digit",month:"short",year:"2-digit"}):""}
-function fmtM(d){return MESES[d.getMonth()]+" "+d.getFullYear()}
 function ssn(d){if(!d)return"?";var y=d.getFullYear(),m=d.getMonth(),s=m>=8?y:y-1;return String(s).slice(2)+"/"+String(s+1).slice(2)}
-function avg(a){var v=a.filter(function(x){return x!=null});return v.length?v.reduce(function(s,x){return s+x},0)/v.length:0}
-function mx(a){var v=a.filter(function(x){return x!=null});return v.length?Math.max.apply(null,v):0}
+function titleCase(s){return s.toLowerCase().replace(/(^|[\s\-\/])([a-záéíóúñü])/g,function(m,a,b){return a+b.toUpperCase()})}
 
 function proc(rows){var r=[];for(var i=0;i<rows.length;i++){var x=rows[i];var date=parseDate(x.FECHA);if(!date)continue;
 r.push({date:date,share:nm(x.SHARE),shareCad:nm(x["SHARE CADENA"]),aud:nm(x["AUDIENCIA MEDIA"]),mc:nm(x["MURCIA CONECTA"]),
 hom:nm(x["SAHRE HOMBRES"]),muj:nm(x.MUJERES),nin:nm(x["NIÑOS"])||nm(x.NINOS),jov:nm(x.JOVENES),ad1:nm(x.ADULT1),ad2:nm(x.ADULT2),may:nm(x.MAYORES),
 h10:nm(x["-10MIL"])||nm(x["-10 MIL"]),h50:nm(x["10-50 MIL"])||nm(x["10-50MIL"]),h200:nm(x["50-200 MIL"])||nm(x["50-200MIL"]),h200p:nm(x["200M"]),
-nP:x["Nº PROGRAMA"],nA:x["Nº ABSOLUTO"],em:(x.EMISION||x["EMISIÓN"]||"").toUpperCase().trim(),type:(x.TIPO||"").toUpperCase().trim(),season:ssn(date),mk:date.getFullYear()+"-"+("0"+(date.getMonth()+1)).slice(-2)})}
+nP:x["Nº PROGRAMA"],nA:x["Nº ABSOLUTO"],pub:(x.PUBLICO||"").trim().toUpperCase(),type:(x.TIPO||"").toUpperCase().trim(),
+season:ssn(date),mk:date.getFullYear()+"-"+("0"+(date.getMonth()+1)).slice(-2)})}
 r.sort(function(a,b){return a.date-b.date});return r}
 
-function applyFilters(){var d=allData;
-if(curEmision==="ORIGINAL")d=d.filter(function(x){return x.type==="ORIGINAL"});
+function parseCSVLine(line){var result=[],current="",inQuotes=false;for(var i=0;i<line.length;i++){var c=line[i];
+if(inQuotes){if(c==='"'&&line[i+1]==='"'){current+='"';i++}else if(c==='"'){inQuotes=false}else{current+=c}}
+else{if(c==='"'){inQuotes=true}else if(c===','){result.push(current.trim());current=""}else{current+=c}}}
+result.push(current.trim());return result}
+
+/* ───────── Utilidades ───────── */
+function vals(a){return a.filter(function(x){return x!=null})}
+function avg(a){var v=vals(a);return v.length?v.reduce(function(s,x){return s+x},0)/v.length:null}
+function mx(a){var v=vals(a);return v.length?Math.max.apply(null,v):null}
+function f1(v){return v==null?"—":v.toLocaleString("es-ES",{minimumFractionDigits:1,maximumFractionDigits:1})}
+function f0(v){return v==null?"—":Math.round(v).toLocaleString("es-ES")}
+function sg(v){return v==null?"—":(v>0?"+":v<0?"−":"")+f1(Math.abs(v))}
+function fmt(d){return d?d.toLocaleDateString("es-ES",{day:"2-digit",month:"short",year:"2-digit"}):""}
+function fmtL(d){return d?d.toLocaleDateString("es-ES",{weekday:"short",day:"numeric",month:"short",year:"numeric"}):""}
+function fmtMk(mk){var p=mk.split("-");return MESES[+p[1]-1]+" "+p[0].slice(2)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function isOrig(x){return x.type==="ORIGINAL"}
+function byEmision(d){return curEmision==="ORIGINAL"?d.filter(isOrig):d}
+function movAvg(a,n){var out=[];for(var i=0;i<a.length;i++){var w=vals(a.slice(Math.max(0,i-n+1),i+1));out.push(w.length?w.reduce(function(s,x){return s+x},0)/w.length:null)}return out}
+// diferencia con la cadena solo con emisiones que tienen los dos datos
+function difCad(d){var p=d.filter(function(x){return x.share!=null&&x.shareCad!=null});return p.length?avg(p.map(function(x){return x.share-x.shareCad})):null}
+function delta(cur,prev,unit){if(cur==null||prev==null)return"";var dd=cur-prev,cls=Math.abs(dd)<0.05?"eq":dd>0?"up":"dn",ic=cls==="eq"?"＝":dd>0?"▲":"▼";
+return'<div class="dl '+cls+'">'+ic+" "+sg(dd)+" "+unit+'</div>'}
+function bar(v,max,color){var w=max?Math.max(0,v/max*100):0;return'<div class="hb"><div class="tr"><div class="fl" style="width:'+w.toFixed(1)+'%'+(color?';background:'+color:'')+'"></div></div><span class="vv">'+f1(v)+'</span></div>'}
+
+/* ───────── Filtros ───────── */
+function applyFilters(){var d=byEmision(allData);
 if(curSeason==="mes"){var now=new Date(),mk=now.getFullYear()+"-"+("0"+(now.getMonth()+1)).slice(-2);d=d.filter(function(x){return x.mk===mk})}
 else if(curSeason==="last10")d=d.slice(-10);
 else if(curSeason!=="all")d=d.filter(function(x){return x.season===curSeason});
 filtData=d;render()}
 
-function showLoad(){app.innerHTML='<div class="ls"><div style="font-size:52px" class="pls">📡</div><div style="font-size:15px;font-weight:700;letter-spacing:4px;color:var(--t2)">CONECTANDO CON GOOGLE SHEETS</div><div style="font-size:11px;color:var(--t3)">Cargando datos...</div></div>'}
-function showErr(m){app.innerHTML='<div class="ls"><div style="font-size:52px">⚠️</div><div style="font-size:15px;font-weight:700;color:var(--rd)">Error al cargar datos</div><div style="font-size:12px;color:var(--t3);max-width:500px">'+m+'</div><button class="br" onclick="loadData()" style="margin-top:20px">Reintentar</button></div>'}
-function trH(t){if(t==null)return"";return'<div class="kt '+(t>=0?"up":"dn")+'">'+(t>=0?"▲":"▼")+" "+Math.abs(t).toFixed(1)+'%</div>'}
-function sC(v,a){if(v==null)return"var(--t3)";return v>a?"var(--gn)":v<a*.8?"var(--rd)":"var(--am)"}
-function rC(i){return i===0?"#fbbf24":i===1?"#94a3b8":i===2?"#d97706":"rgba(255,255,255,0.2)"}
+function showLoad(){app.innerHTML='<div class="ls"><div style="font-size:48px">📡</div><div style="font-size:16px;font-weight:700;color:var(--t2)">Conectando con Google Sheets…</div></div>'}
+function showErr(m){app.innerHTML='<div class="ls"><div style="font-size:48px">⚠️</div><div style="font-size:16px;font-weight:700;color:var(--neg)">Error al cargar datos</div><div style="font-size:13px;color:var(--t3);max-width:500px">'+esc(m)+'</div><button class="btn" onclick="loadData()">Reintentar</button></div>'}
 
-function monthRank(data){var m={};for(var i=0;i<data.length;i++){var x=data[i];if(x.share==null)continue;if(!m[x.mk])m[x.mk]={s:[],d:x.date};m[x.mk].s.push(x.share)}
-var a=[];for(var k in m)a.push({k:k,avg:avg(m[k].s),n:m[k].s.length,d:m[k].d});a.sort(function(a,b){return b.avg-a.avg});return a.slice(0,10)}
+/* ───────── Render ───────── */
+function render(){
+charts.forEach(function(c){c.destroy()});charts=[];
+var d=filtData,last=d.length?d[d.length-1]:null;
+var aS=avg(d.map(function(x){return x.share})),aA=avg(d.map(function(x){return x.aud})),dC=difCad(d),mxS=mx(d.map(function(x){return x.share}));
 
-function render(){var d=filtData,sh=d.map(function(x){return x.share}),au=d.map(function(x){return x.aud}),ca=d.map(function(x){return x.shareCad});
-var aS=avg(sh),aA=avg(au),mxS=mx(sh),aCad=avg(ca);
-var r20=d.slice(-20),p20=d.slice(-40,-20);
-var tS=p20.length>5?((avg(r20.map(function(x){return x.share}))-avg(p20.map(function(x){return x.share})))/(avg(p20.map(function(x){return x.share}))||1))*100:null;
-var tA=p20.length>5?((avg(r20.map(function(x){return x.aud}))-avg(p20.map(function(x){return x.aud})))/(avg(p20.map(function(x){return x.aud}))||1))*100:null;
-var rk=d.filter(function(x){return x.share!=null}).slice().sort(function(a,b){return b.share-a.share});
-var t10=rk.slice(0,10),b5=rk.slice(-5).reverse(),mR=monthRank(d),rec=d.slice(-10).reverse(),last=d.length?d[d.length-1]:null;
+// Comparación con la temporada anterior (solo si hay una temporada elegida)
+var prevS=null,prevA=null,prevD=null,si=allSeasons.indexOf(curSeason);
+if(si>0){var pd=byEmision(allData).filter(function(x){return x.season===allSeasons[si-1]});prevS=avg(pd.map(function(x){return x.share}));prevA=avg(pd.map(function(x){return x.aud}));prevD=difCad(pd)}
+var vsTxt=si>0?'<div class="ks">vs T'+allSeasons[si-1]+'</div>':'';
 
 var sO='<option value="all"'+(curSeason==="all"?" selected":"")+'>Todas las temporadas</option><option value="mes"'+(curSeason==="mes"?" selected":"")+'>Mes en curso</option><option value="last10"'+(curSeason==="last10"?" selected":"")+'>Últimos 10 programas</option>';
-for(var i=0;i<allSeasons.length;i++){var s=allSeasons[i];sO+='<option value="'+s+'"'+(curSeason===s?" selected":"")+'>T'+s+'</option>'}
-var dO='<option value="none"'+(curDemo==="none"?" selected":"")+'>Seleccionar...</option><option value="genero"'+(curDemo==="genero"?" selected":"")+'>Género (H/M)</option><option value="edades"'+(curDemo==="edades"?" selected":"")+'>Edades</option><option value="habitat"'+(curDemo==="habitat"?" selected":"")+'>Hábitat</option>';
+for(var i=allSeasons.length-1;i>=0;i--){var s=allSeasons[i];sO+='<option value="'+s+'"'+(curSeason===s?" selected":"")+'>Temporada '+s+'</option>'}
 
-var tH="",bH="",mH="",rH="";
-for(var i=0;i<t10.length;i++){var x=t10[i];tH+='<div class="ri"><div style="display:flex;align-items:center"><span class="rn" style="color:'+rC(i)+';font-size:'+(i<3?16:12)+'px">'+(i+1)+'</span><span class="rdt">'+fmt(x.date)+'</span></div><span class="rv" style="color:var(--gn)">'+x.share.toFixed(1)+'%</span></div>'}
-for(var i=0;i<b5.length;i++){var x=b5[i];bH+='<div class="ri"><div style="display:flex;align-items:center"><span class="rn" style="color:rgba(255,255,255,0.2);font-size:12px">'+(i+1)+'</span><span class="rdt">'+fmt(x.date)+'</span></div><span class="rv" style="color:var(--rd)">'+x.share.toFixed(1)+'%</span></div>'}
-for(var i=0;i<mR.length;i++){var x=mR[i];mH+='<div class="ri"><div style="display:flex;align-items:center"><span class="rn" style="color:'+rC(i)+';font-size:'+(i<3?16:12)+'px">'+(i+1)+'</span><span class="rdt">'+fmtM(x.d)+' <span style="color:var(--t4);font-size:9px">('+x.n+')</span></span></div><span class="rv" style="color:var(--cy)">'+x.avg.toFixed(1)+'%</span></div>'}
-for(var i=0;i<rec.length;i++){var x=rec[i];rH+='<tr><td>'+fmt(x.date)+'</td><td style="font-weight:700;color:'+sC(x.share,aS)+'">'+(x.share!=null?x.share.toFixed(1):"—")+'</td><td style="color:var(--pk)">'+(x.shareCad!=null?x.shareCad.toFixed(1):"—")+'</td><td style="color:var(--t2)">'+(x.aud!=null?x.aud:"—")+'</td><td style="color:var(--or)">'+(x.mc!=null?x.mc.toFixed(1):"—")+'</td><td style="color:var(--t3)">'+(x.nA||x.nP||"—")+'</td></tr>'}
+var h='';
+h+='<div class="hd"><div><div class="logo">AILOVIU</div><div class="sub">Dashboard de audiencias · La 7 TV</div></div>'+
+'<div class="hr"><span>'+d.length+' emisiones'+(loadTs?' · actualizado '+loadTs.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"}):'')+'</span><button class="btn" onclick="loadData()" title="Recargar datos">🔄 Recargar</button></div></div>';
+h+='<div class="filters"><div class="fgroup"><span class="flabel">Periodo</span><select class="fsel" onchange="onS(this.value)">'+sO+'</select></div>'+
+'<div class="fgroup"><span class="flabel">Emisiones</span><div class="seg"><button class="'+(curEmision==="ORIGINAL"?"on":"")+'" onclick="onE(\'ORIGINAL\')">Originales</button><button class="'+(curEmision==="ALL"?"on":"")+'" onclick="onE(\'ALL\')">Todas</button></div></div></div>';
 
-app.innerHTML='<div class="hd fi"><div><div class="logo">AILOVIU</div><div class="sub">Dashboard de Audiencias · La 7 TV</div></div><div class="hr"><div class="mta">'+rawCount+' filas · '+d.length+' emisiones'+(loadTs?' · '+loadTs.toLocaleTimeString("es-ES"):'')+'</div><button class="br" onclick="loadData()">🔄</button></div></div>'+
-'<div class="filters fi" style="animation-delay:.05s"><div class="fgroup"><div class="flabel">Temporada</div><select class="fsel" onchange="onS(this.value)">'+sO+'</select></div><div class="fgroup"><div class="flabel">Emisión</div><div class="toggle-wrap"><button class="tog '+(curEmision==="ORIGINAL"?"on":"off")+'" onclick="onE(\'ORIGINAL\')">Original</button><button class="tog '+(curEmision==="ALL"?"on":"off")+'" onclick="onE(\'ALL\')">Todos</button></div></div><div class="fgroup"><div class="flabel">Demografía</div><select class="fsel" onchange="onD(this.value)">'+dO+'</select></div></div>'+
-'<div class="kpis fi" style="animation-delay:.1s"><div class="gl kpi"><div class="kl">Share medio</div><div class="kv" style="color:var(--v)">'+aS.toFixed(1)+'<span class="ku">%</span></div><div class="ks">Máx: '+mxS.toFixed(1)+'%</div>'+trH(tS)+'</div><div class="gl kpi"><div class="kl">Share cadena</div><div class="kv" style="color:var(--pk)">'+aCad.toFixed(1)+'<span class="ku">%</span></div><div class="ks">Media La 7 TV</div></div><div class="gl kpi"><div class="kl">Audiencia media</div><div class="kv" style="color:var(--cy)">'+Math.round(aA).toLocaleString("es-ES")+'</div><div class="ks">espectadores</div>'+trH(tA)+'</div><div class="gl kpi"><div class="kl">Emisiones</div><div class="kv" style="color:var(--gn)">'+d.length+'</div><div class="ks">'+(curEmision==="ORIGINAL"?"originales":"todas")+'</div></div><div class="gl kpi"><div class="kl">Último share</div><div class="kv" style="color:var(--am)">'+(last&&last.share!=null?last.share.toFixed(1):"—")+'<span class="ku">%</span></div><div class="ks">'+(last?fmt(last.date):"")+'</div></div></div>'+
-'<div class="crow fi" style="animation-delay:.15s"><div class="gl"><div class="ctit">Evolución Share + Cadena</div><canvas id="cS"></canvas></div><div class="gl"><div class="ctit">Evolución Audiencia</div><canvas id="cA"></canvas></div></div>'+
-'<div class="gl fc fi" style="animation-delay:.2s"><div class="ctit">AILOVIU vs Murcia Conecta vs Cadena</div><canvas id="cD"></canvas></div>'+
-(curDemo!=="none"?'<div class="gl fc fi" style="animation-delay:.22s"><div class="ctit" id="demT"></div><canvas id="cDem"></canvas></div>':'')+
-'<div class="bg3 fi" style="animation-delay:.25s"><div class="gl"><div class="sl">🏆 Top 10 Emisiones</div>'+tH+'<div class="sl mt2">📉 5 Peores</div>'+bH+'</div><div class="gl"><div class="sl">📅 Top 10 Meses</div>'+mH+'</div><div class="gl"><div class="sl">📋 Últimas 10</div><div style="overflow-x:auto"><table class="dtb"><thead><tr><th style="text-align:left">Fecha</th><th>Share</th><th>Cadena</th><th>Aud.</th><th>M.C.</th><th>Nº</th></tr></thead><tbody>'+rH+'</tbody></table></div></div></div>'+
-'<div class="ft fi" style="animation-delay:.35s">AILOVIU · La 7 TV · Región de Murcia · Datos en directo</div>';
-renderCharts(d);if(curDemo!=="none")renderDemo(d)}
+if(!d.length){h+='<div class="card" style="text-align:center;color:var(--t3);padding:40px">No hay emisiones en este periodo.</div>';app.innerHTML=h;return}
 
-function renderCharts(d){if(cS)cS.destroy();if(cA)cA.destroy();if(cD)cD.destroy();
-var lb=d.map(function(x){return fmt(x.date)}),sd=d.map(function(x){return x.share}),ad=d.map(function(x){return x.aud}),md=d.map(function(x){return x.mc}),cd=d.map(function(x){return x.shareCad});
-var gc="rgba(255,255,255,0.04)",tc="rgba(255,255,255,0.25)";
-var sx={x:{ticks:{color:tc,font:{family:"JetBrains Mono",size:8},maxRotation:45,maxTicksLimit:12},grid:{color:gc}},y:{ticks:{color:tc,font:{family:"JetBrains Mono",size:9}},grid:{color:gc}}};
-var tp={backgroundColor:"rgba(15,10,30,0.92)",titleFont:{family:"Outfit"},bodyFont:{family:"JetBrains Mono",size:11},borderColor:"rgba(167,139,250,0.3)",borderWidth:1,cornerRadius:10,padding:12};
-var lg={display:true,labels:{color:"rgba(255,255,255,0.5)",font:{family:"Outfit",size:10,weight:600},boxWidth:16,padding:14,usePointStyle:true,pointStyle:"line"}};
-var io={intersect:false,mode:"index"};
+// KPIs
+h+='<div class="kpis">'+
+kpi("Share medio",f1(aS),"%",(delta(aS,prevS,"pts")||'')+vsTxt+'<div class="ks">Máximo '+f1(mxS)+' %</div>')+
+kpi("Diferencia con la cadena",sg(dC),"pts",(delta(dC,prevD,"pts")||'')+'<div class="ks">'+(dC==null?'':dC>=0?'AILOVIU por encima de La 7':'AILOVIU por debajo de La 7')+'</div>')+
+kpi("Audiencia media",f1(aA),"mil",(delta(aA,prevA,"mil")||'')+'<div class="ks">espectadores por minuto</div>')+
+kpi("Emisiones",String(d.length),"",'<div class="ks">'+(curEmision==="ORIGINAL"?"originales":"originales y repeticiones")+'</div>')+
+kpi("Último programa",f1(last.share),"%",'<div class="ks">'+fmtL(last.date)+(last.nP?' · '+esc(last.nP):'')+'</div>')+
+'</div>';
 
-var e1=document.getElementById("cS");
-if(e1){var x1=e1.getContext("2d"),g1=x1.createLinearGradient(0,0,0,250);g1.addColorStop(0,"rgba(167,139,250,0.2)");g1.addColorStop(1,"rgba(167,139,250,0)");
-cS=new Chart(x1,{type:"line",data:{labels:lb,datasets:[{label:"AILOVIU",data:sd,borderColor:"#a78bfa",backgroundColor:g1,borderWidth:2,fill:true,tension:.3,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:"#a78bfa"},{label:"Cadena",data:cd,borderColor:"#f472b6",borderWidth:1.5,borderDash:[4,3],tension:.3,pointRadius:0,fill:false}]},options:{responsive:true,aspectRatio:2.2,scales:sx,plugins:{legend:lg,tooltip:tp},interaction:io}})}
+// Evolución
+h+='<div class="sec">Evolución</div>';
+h+='<div class="g2"><div class="card"><div class="ctit">Share</div><div class="cnote">Línea: media de las últimas '+MA_N+' emisiones · puntos: cada emisión</div><div class="cbox"><canvas id="cShare"></canvas></div></div>'+
+'<div class="card"><div class="ctit">Audiencia media (miles)</div><div class="cnote">Línea: media de las últimas '+MA_N+' emisiones · puntos: cada emisión</div><div class="cbox"><canvas id="cAud"></canvas></div></div></div>';
+h+='<div class="card mb"><div class="ctit">AILOVIU frente a la cadena, por mes</div><div class="cnote">Puntos de share de diferencia. Por encima de 0: AILOVIU supera la media de La 7 TV.</div><div class="cbox"><canvas id="cDif"></canvas></div></div>';
 
-var e2=document.getElementById("cA");
-if(e2){var x2=e2.getContext("2d"),g2=x2.createLinearGradient(0,0,0,250);g2.addColorStop(0,"rgba(56,189,248,0.2)");g2.addColorStop(1,"rgba(56,189,248,0)");
-cA=new Chart(x2,{type:"line",data:{labels:lb,datasets:[{data:ad,borderColor:"#38bdf8",backgroundColor:g2,borderWidth:2,fill:true,tension:.3,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:"#38bdf8"}]},options:{responsive:true,aspectRatio:2.2,scales:sx,plugins:{legend:{display:false},tooltip:tp},interaction:io}})}
+// Temporadas
+h+='<div class="sec">Comparativa de temporadas</div>';
+h+='<div class="card mb"><div class="ctit">Temporada contra temporada</div><div class="cnote">Share (media de '+MA_N+' emisiones) según el nº de emisión dentro de cada temporada · '+(curEmision==="ORIGINAL"?"originales":"todas las emisiones")+' · no depende del periodo elegido</div><div class="cbox tall"><canvas id="cSeas"></canvas></div></div>';
+h+='<div class="g2"><div class="card"><div class="ctit">Resumen por temporada</div><div class="cnote">Originales · la fila marcada es la temporada en curso</div><div class="scroll">'+seasonTable()+'</div></div>'+
+'<div class="card"><div class="ctit">Originales frente a repeticiones</div><div class="cnote">Share medio por temporada</div><div class="cbox"><canvas id="cOR"></canvas></div></div></div>';
 
-var e3=document.getElementById("cD");
-if(e3){cD=new Chart(e3.getContext("2d"),{type:"line",data:{labels:lb,datasets:[{label:"AILOVIU",data:sd,borderColor:"#a78bfa",borderWidth:2.5,tension:.3,pointRadius:0,pointHoverRadius:5},{label:"Murcia Conecta",data:md,borderColor:"#fb923c",borderWidth:1.8,borderDash:[6,4],tension:.3,pointRadius:0},{label:"Cadena",data:cd,borderColor:"#f472b6",borderWidth:1.5,borderDash:[3,3],tension:.3,pointRadius:0}]},options:{responsive:true,aspectRatio:2.8,scales:sx,plugins:{legend:lg,tooltip:tp},interaction:io}})}}
+// Cuándo funciona
+h+='<div class="sec">Cuándo funciona mejor</div>';
+h+='<div class="g2"><div class="card"><div class="ctit">Share por mes y día de la semana</div><div class="cnote">Media del periodo elegido · pasa el ratón para ver cuántas emisiones hay detrás</div>'+heatmap(d)+'</div>'+
+'<div class="card"><div class="ctit">Perfil de la audiencia</div><div class="cnote">Share medio en cada grupo. La marca blanca es el share total ('+f1(aS)+' %).</div>'+profile(d,aS)+'</div></div>';
 
-function renderDemo(d){if(cDem)cDem.destroy();var el=document.getElementById("cDem"),tEl=document.getElementById("demT");if(!el)return;
-var lb=d.map(function(x){return fmt(x.date)}),ds=[],ti="",co=["#a78bfa","#38bdf8","#4ade80","#fbbf24","#fb923c","#f87171","#f472b6"];
-if(curDemo==="genero"){ti="Share por Género";ds=[{label:"Hombres",data:d.map(function(x){return x.hom}),borderColor:co[1],borderWidth:2,tension:.3,pointRadius:0},{label:"Mujeres",data:d.map(function(x){return x.muj}),borderColor:co[6],borderWidth:2,tension:.3,pointRadius:0}]}
-else if(curDemo==="edades"){ti="Share por Edades";ds=[{label:"Niños",data:d.map(function(x){return x.nin}),borderColor:co[2],borderWidth:1.5,tension:.3,pointRadius:0},{label:"Jóvenes",data:d.map(function(x){return x.jov}),borderColor:co[1],borderWidth:1.5,tension:.3,pointRadius:0},{label:"Adult1",data:d.map(function(x){return x.ad1}),borderColor:co[0],borderWidth:1.5,tension:.3,pointRadius:0},{label:"Adult2",data:d.map(function(x){return x.ad2}),borderColor:co[3],borderWidth:1.5,tension:.3,pointRadius:0},{label:"Mayores",data:d.map(function(x){return x.may}),borderColor:co[4],borderWidth:1.5,tension:.3,pointRadius:0}]}
-else if(curDemo==="habitat"){ti="Share por Hábitat";ds=[{label:"-10mil",data:d.map(function(x){return x.h10}),borderColor:co[2],borderWidth:1.5,tension:.3,pointRadius:0},{label:"10-50mil",data:d.map(function(x){return x.h50}),borderColor:co[1],borderWidth:1.5,tension:.3,pointRadius:0},{label:"50-200mil",data:d.map(function(x){return x.h200}),borderColor:co[3],borderWidth:1.5,tension:.3,pointRadius:0},{label:"200M+",data:d.map(function(x){return x.h200p}),borderColor:co[4],borderWidth:1.5,tension:.3,pointRadius:0}]}
-if(tEl)tEl.textContent=ti;
-var gc="rgba(255,255,255,0.04)",tc="rgba(255,255,255,0.25)";
-cDem=new Chart(el.getContext("2d"),{type:"line",data:{labels:lb,datasets:ds},options:{responsive:true,aspectRatio:2.8,scales:{x:{ticks:{color:tc,font:{family:"JetBrains Mono",size:8},maxRotation:45,maxTicksLimit:12},grid:{color:gc}},y:{ticks:{color:tc,font:{family:"JetBrains Mono",size:9}},grid:{color:gc}}},plugins:{legend:{display:true,labels:{color:"rgba(255,255,255,0.5)",font:{family:"Outfit",size:10,weight:600},boxWidth:16,padding:14,usePointStyle:true,pointStyle:"line"}},tooltip:{backgroundColor:"rgba(15,10,30,0.92)",bodyFont:{family:"JetBrains Mono",size:11},cornerRadius:10,padding:12}},interaction:{intersect:false,mode:"index"}}})}
+// Localidades
+h+='<div class="sec">Localidades</div>';
+h+='<div class="card mb"><div class="ctit">Share por localidad de grabación</div><div class="cnote">Columna PUBLICO de la hoja · localidades con al menos 2 emisiones en el periodo</div>'+locTable(d,aS)+'</div>';
+
+// Murcia Conecta
+var dm=d.filter(function(x){return x.mc!=null&&x.share!=null});
+h+='<div class="sec">Competencia</div>';
+h+='<div class="card mb"><div class="ctit">AILOVIU frente a Murcia Conecta</div><div class="cnote">'+(dm.length?'Media de '+MA_N+' emisiones · solo las '+dm.length+' emisiones del periodo con dato de Murcia Conecta':'No hay datos de Murcia Conecta en este periodo')+'</div>'+(dm.length?'<div class="cbox"><canvas id="cMC"></canvas></div>':'')+'</div>';
+
+// Rankings
+h+='<div class="sec">Rankings</div>';
+h+=rankings(d,aS);
+h+='<div class="ft">AILOVIU · La 7 TV · Región de Murcia · datos en directo desde Google Sheets</div>';
+app.innerHTML=h;
+
+drawCharts(d,dm);
+}
+
+function kpi(label,value,unit,extra){return'<div class="card kpi"><div class="kl">'+label+'</div><div class="kv">'+value+(unit?'<span class="ku">'+unit+'</span>':'')+'</div>'+(extra||'')+'</div>'}
+
+/* ───────── Tablas y bloques HTML ───────── */
+function seasonTable(){
+var rows=allSeasons.map(function(s){var all=allData.filter(function(x){return x.season===s}),o=all.filter(isOrig),r=all.filter(function(x){return!isOrig(x)});
+return{s:s,n:o.length,sh:avg(o.map(function(x){return x.share})),dc:difCad(o),au:avg(o.map(function(x){return x.aud})),rep:avg(r.map(function(x){return x.share}))}});
+var m=mx(rows.map(function(r){return r.sh})),cur=allSeasons[allSeasons.length-1];
+var t='<table class="tbl"><thead><tr><th>Temporada</th><th>Emisiones</th><th>Share medio</th><th>vs cadena</th><th>Audiencia</th></tr></thead><tbody>';
+for(var i=rows.length-1;i>=0;i--){var r=rows[i];
+t+='<tr class="'+(r.s===cur?"cur":"")+'"><td>T'+r.s+(r.s===cur?' · en curso':'')+'</td><td>'+r.n+'</td><td class="bar">'+bar(r.sh,m)+'</td><td class="'+(r.dc>=0?"pos":"neg")+'">'+(r.dc==null?"—":(r.dc>=0?"▲ ":"▼ ")+sg(r.dc))+'</td><td>'+f1(r.au)+' mil</td></tr>'}
+return t+'</tbody></table>'}
+
+function heatmap(d){
+var cells={},months=[];d.forEach(function(x){var wd=x.date.getDay();if(wd<1||wd>5||x.share==null)return;var m=x.date.getMonth(),k=m+"|"+wd;(cells[k]=cells[k]||[]).push(x.share);if(months.indexOf(m)<0)months.push(m)});
+var order=[8,9,10,11,0,1,2,3,4,5,6,7];months=order.filter(function(m){return months.indexOf(m)>=0});
+if(!months.length)return'<div class="cnote">Sin datos.</div>';
+var vs=Object.keys(cells).map(function(k){return avg(cells[k])}),lo=Math.min.apply(null,vs),hi=Math.max.apply(null,vs);
+var t='<div class="heat"><div></div>'+[1,2,3,4,5].map(function(w){return'<div class="hh">'+DIAS[w]+'</div>'}).join("");
+months.forEach(function(m){t+='<div class="hm">'+MESES[m]+'</div>';
+for(var w=1;w<=5;w++){var c=cells[m+"|"+w];if(!c){t+='<div class="hc empty">—</div>';continue}
+var v=avg(c),k=hi>lo?(v-lo)/(hi-lo):0.5,col=seqColor(k);
+t+='<div class="hc" style="background:'+col+';color:'+(k>0.55?"#0b0b14":"#fff")+'" data-tip="<b>'+MESES[m]+' · '+DIAS[w]+'</b><br>Share medio '+f1(v)+' %<br>'+c.length+' emisiones">'+f1(v)+'</div>'}});
+t+='</div><div class="scale"><span>'+f1(lo)+' %</span><div class="sb" style="background:linear-gradient(90deg,'+seqColor(0)+','+seqColor(1)+')"></div><span>'+f1(hi)+' %</span></div>';
+return t}
+// rampa secuencial azul (paso 600 → 200)
+function seqColor(k){var a=[0x18,0x4f,0x95],b=[0x9e,0xc5,0xf4];return"rgb("+a.map(function(x,i){return Math.round(x+(b[i]-x)*k)}).join(",")+")"}
+
+function profile(d,ref){
+var G=[["Hombres","hom"],["Mujeres","muj"],["Niños (4-12)","nin"],["Jóvenes (13-24)","jov"],["Adultos (25-44)","ad1"],["Adultos (45-64)","ad2"],["Mayores de 65","may"]];
+var H=[["Menos de 10 mil hab.","h10"],["10-50 mil hab.","h50"],["50-200 mil hab.","h200"],["Más de 200 mil hab.","h200p"]];
+function block(title,list){var rs=list.map(function(g){var v=d.map(function(x){return x[g[1]]});return{l:g[0],v:avg(v),n:vals(v).length}});
+var m=Math.max(mx(rs.map(function(r){return r.v}))||0,ref||0);if(!m)return'';
+var nMax=Math.max.apply(null,rs.map(function(r){return r.n}));
+var out='<div style="font-size:13px;font-weight:700;margin:6px 0 4px">'+title+' <span style="color:var(--t3);font-weight:400">· '+nMax+' emisiones con dato</span></div>';
+rs.forEach(function(r){out+='<div class="prow" data-tip="<b>'+r.l+'</b><br>Share medio '+f1(r.v)+' %<br>'+r.n+' emisiones con dato"><span class="pl">'+r.l+'</span><div class="tr"><div class="fl" style="width:'+(r.v==null?0:r.v/m*100).toFixed(1)+'%"></div>'+(ref?'<div class="ref" style="left:'+(ref/m*100).toFixed(1)+'%"></div>':'')+'</div><span class="pv">'+f1(r.v)+'</span></div>'});
+return out}
+return block("Sexo y edad",G)+'<div style="height:14px"></div>'+block("Tamaño del municipio",H)+'<div class="legend"><span><i style="background:var(--s1)"></i>Share medio del grupo</span><span><i class="tick"></i>Share total</span></div>'}
+
+function locTable(d,ref){
+var g={};d.forEach(function(x){if(!x.pub)return;(g[x.pub]=g[x.pub]||[]).push(x)});
+var rows=Object.keys(g).map(function(k){var a=g[k];return{l:titleCase(k),n:a.length,sh:avg(a.map(function(x){return x.share})),au:avg(a.map(function(x){return x.aud})),last:a[a.length-1].date}})
+.filter(function(r){return r.n>=2&&r.sh!=null}).sort(function(a,b){return b.sh-a.sh});
+if(!rows.length)return'<div class="cnote">No hay localidades con al menos 2 emisiones en este periodo. (La temporada 26/27 todavía no tiene la columna PUBLICO rellena.)</div>';
+var m=rows[0].sh,show=showAllLoc?rows:rows.slice(0,15);
+var t='<div class="scroll"><table class="tbl"><thead><tr><th>#</th><th style="text-align:left">Localidad</th><th>Emisiones</th><th>Share medio</th><th>vs media</th><th>Audiencia</th><th>Última</th></tr></thead><tbody>';
+show.forEach(function(r,i){var dv=r.sh-ref;t+='<tr><td style="color:var(--t3)">'+(i+1)+'</td><td style="text-align:left">'+esc(r.l)+'</td><td>'+r.n+'</td><td class="bar">'+bar(r.sh,m)+'</td><td class="'+(dv>=0?"pos":"neg")+'">'+(dv>=0?"▲ ":"▼ ")+sg(dv)+'</td><td>'+f1(r.au)+' mil</td><td style="color:var(--t3)">'+fmt(r.last)+'</td></tr>'});
+t+='</tbody></table></div>';
+if(rows.length>15)t+='<button class="btn more" onclick="toggleLoc()">'+(showAllLoc?'Ver solo las 15 primeras':'Ver las '+rows.length+' localidades')+'</button>';
+return t}
+
+function rankings(d){
+var rk=d.filter(function(x){return x.share!=null}).slice().sort(function(a,b){return b.share-a.share});
+var top=rk.slice(0,10),worst=rk.slice(-5).reverse(),rec=d.slice(-10).reverse();
+var mm={};d.forEach(function(x){if(x.share==null)return;(mm[x.mk]=mm[x.mk]||[]).push(x.share)});
+var months=Object.keys(mm).map(function(k){return{k:k,v:avg(mm[k]),n:mm[k].length}}).sort(function(a,b){return b.v-a.v}).slice(0,10);
+function li(i,label,v){return'<div class="ri"><span class="rn">'+(i+1)+'</span><span class="rd">'+label+'</span><span class="rv">'+f1(v)+' %</span></div>'}
+var a='<div class="card"><div class="sl">🏆 Mejores emisiones</div>'+top.map(function(x,i){return li(i,fmt(x.date)+(x.pub?' · '+esc(titleCase(x.pub)):''),x.share)}).join("")+
+'<div class="sl mt">📉 Peores emisiones</div>'+worst.map(function(x,i){return li(i,fmt(x.date)+(x.pub?' · '+esc(titleCase(x.pub)):''),x.share)}).join("")+'</div>';
+var b='<div class="card"><div class="sl">📅 Mejores meses</div>'+months.map(function(x,i){return li(i,fmtMk(x.k)+' <span style="color:var(--t3)">('+x.n+')</span>',x.v)}).join("")+'</div>';
+var c='<div class="card"><div class="sl">📋 Últimas 10 emisiones</div><div class="scroll"><table class="tbl"><thead><tr><th>Fecha</th><th>Nº</th><th>Share</th><th>Cadena</th><th>Aud.</th></tr></thead><tbody>'+
+rec.map(function(x){return'<tr><td>'+fmt(x.date)+'</td><td style="color:var(--t3)">'+esc(x.nP||(isOrig(x)?"":"rep."))+'</td><td style="font-weight:700">'+f1(x.share)+'</td><td>'+f1(x.shareCad)+'</td><td>'+f1(x.aud)+'</td></tr>'}).join("")+'</tbody></table></div></div>';
+return'<div class="g3">'+a+b+c+'</div>'}
+
+/* ───────── Gráficos (Chart.js) ───────── */
+Chart.defaults.font.family="Outfit, system-ui, sans-serif";Chart.defaults.font.size=12;Chart.defaults.color=C.t2;
+function axes(yUnit,extraY){return{x:{ticks:{color:C.t3,maxRotation:0,autoSkip:true,maxTicksLimit:8},grid:{display:false},border:{color:C.grid}},
+y:Object.assign({ticks:{color:C.t3,callback:function(v){return v.toLocaleString("es-ES")+(yUnit||"")}},grid:{color:C.grid},border:{display:false}},extraY||{})}}
+var TT={backgroundColor:"rgba(15,10,30,0.96)",borderColor:"rgba(255,255,255,0.15)",borderWidth:1,cornerRadius:10,padding:12,titleFont:{weight:700},bodySpacing:4,usePointStyle:true,boxPadding:4};
+var LEG={display:true,position:"bottom",labels:{color:C.t2,usePointStyle:true,pointStyle:"line",boxWidth:24,padding:16}};
+function line(label,data,color,width,extra){return Object.assign({type:"line",label:label,data:data,borderColor:color,backgroundColor:color,borderWidth:width||2,pointRadius:0,pointHoverRadius:5,pointHoverBorderWidth:2,pointHoverBorderColor:"#13101f",tension:0.3,spanGaps:true,fill:false},extra||{})}
+function dots(label,data,color){return{type:"line",label:label,data:data,showLine:false,pointRadius:2,pointHoverRadius:5,pointBackgroundColor:color,pointBorderWidth:0,borderColor:color,backgroundColor:color,pointStyle:"circle"}}
+function mk(id,cfg){var el=document.getElementById(id);if(!el)return;cfg.type=cfg.type||"line";cfg.options=Object.assign({responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:"index"},animation:{duration:300}},cfg.options||{});charts.push(new Chart(el.getContext("2d"),cfg))}
+function pct(ctx){return ctx.dataset.label+": "+(ctx.parsed.y==null?"—":f1(ctx.parsed.y)+" %")}
+
+function drawCharts(d,dm){
+var lb=d.map(function(x){return fmt(x.date)});
+var sh=d.map(function(x){return x.share}),cad=d.map(function(x){return x.shareCad}),au=d.map(function(x){return x.aud});
+
+mk("cShare",{data:{labels:lb,datasets:[
+ line("AILOVIU",movAvg(sh,MA_N),C.s1,2.5),
+ line("Cadena La 7",movAvg(cad,MA_N),C.ctx,1.5),
+ dots("AILOVIU por emisión",sh,"rgba(57,135,229,0.35)")]},
+ options:{scales:axes(" %"),plugins:{legend:LEG,tooltip:Object.assign({},TT,{callbacks:{label:pct}})}}});
+
+mk("cAud",{data:{labels:lb,datasets:[
+ line("Audiencia media",movAvg(au,MA_N),C.s1,2.5),
+ dots("Por emisión",au,"rgba(57,135,229,0.35)")]},
+ options:{scales:axes(""),plugins:{legend:LEG,tooltip:Object.assign({},TT,{callbacks:{label:function(c){return c.dataset.label+": "+(c.parsed.y==null?"—":f1(c.parsed.y)+" mil")}}})}}});
+
+// Diferencia mensual con la cadena (divergente)
+var mm={};d.forEach(function(x){if(x.share==null||x.shareCad==null)return;(mm[x.mk]=mm[x.mk]||[]).push(x.share-x.shareCad)});
+var mks=Object.keys(mm).sort(),dv=mks.map(function(k){return avg(mm[k])});
+mk("cDif",{type:"bar",data:{labels:mks.map(fmtMk),datasets:[{label:"Diferencia con la cadena",data:dv,backgroundColor:dv.map(function(v){return v>=0?C.s1:C.neg}),borderRadius:4,borderSkipped:"start",maxBarThickness:28,categoryPercentage:0.9,barPercentage:0.9}]},
+ options:{interaction:{intersect:false,mode:"index"},scales:axes(" pts",{grid:{color:function(c){return c.tick&&c.tick.value===0?"rgba(255,255,255,0.35)":C.grid}}}),
+ plugins:{legend:{display:false},tooltip:Object.assign({},TT,{callbacks:{label:function(c){var k=mks[c.dataIndex];return[(c.parsed.y>=0?"▲ ":"▼ ")+sg(c.parsed.y)+" pts frente a La 7",mm[k].length+" emisiones"]}}})}}});
+
+// Temporada contra temporada
+var base=byEmision(allData),maxN=0,ss={};
+allSeasons.forEach(function(s){var a=base.filter(function(x){return x.season===s});ss[s]=a;maxN=Math.max(maxN,a.length)});
+var cur=allSeasons[allSeasons.length-1],prev=allSeasons[allSeasons.length-2];
+var sd=allSeasons.map(function(s){var a=ss[s],ma=movAvg(a.map(function(x){return x.share}),MA_N),dates=a.map(function(x){return x.date});
+ var color=s===cur?C.s1:s===prev?C.s2:"rgba(125,127,140,0.55)",w=s===cur?3:s===prev?2:1.25;
+ return line("T"+s+(s===cur?" (en curso)":""),ma,color,w,{_dates:dates,order:s===cur?0:s===prev?1:2})}).reverse();
+var xl=[];for(var i=1;i<=maxN;i++)xl.push(i);
+mk("cSeas",{data:{labels:xl,datasets:sd},options:{scales:Object.assign(axes(" %"),{x:{title:{display:true,text:"Nº de emisión en la temporada",color:C.t3},ticks:{color:C.t3,maxTicksLimit:10,maxRotation:0},grid:{display:false}}}),
+ plugins:{legend:LEG,tooltip:Object.assign({},TT,{itemSort:function(a,b){return a.datasetIndex-b.datasetIndex},callbacks:{title:function(c){return"Emisión nº "+c[0].label},label:function(c){var dt=c.dataset._dates[c.dataIndex];return c.dataset.label+": "+f1(c.parsed.y)+" %"+(dt?" ("+fmt(dt)+")":"")}}})}}});
+
+// Originales frente a repeticiones
+var oS=allSeasons.map(function(s){return avg(allData.filter(function(x){return x.season===s&&isOrig(x)}).map(function(x){return x.share}))});
+var rS=allSeasons.map(function(s){return avg(allData.filter(function(x){return x.season===s&&!isOrig(x)}).map(function(x){return x.share}))});
+mk("cOR",{type:"bar",data:{labels:allSeasons.map(function(s){return"T"+s}),datasets:[
+ {label:"Originales",data:oS,backgroundColor:C.s1,borderRadius:4,borderSkipped:"start",maxBarThickness:34,categoryPercentage:0.7,barPercentage:0.92},
+ {label:"Repeticiones",data:rS,backgroundColor:C.ctx,borderRadius:4,borderSkipped:"start",maxBarThickness:34,categoryPercentage:0.7,barPercentage:0.92}]},
+ options:{scales:axes(" %",{beginAtZero:true}),plugins:{legend:Object.assign({},LEG,{labels:Object.assign({},LEG.labels,{pointStyle:"rectRounded",boxWidth:12})}),tooltip:Object.assign({},TT,{callbacks:{label:pct}})}}});
+
+// Murcia Conecta
+if(dm.length)mk("cMC",{data:{labels:dm.map(function(x){return fmt(x.date)}),datasets:[
+ line("AILOVIU",movAvg(dm.map(function(x){return x.share}),MA_N),C.s1,2.5),
+ line("Murcia Conecta",movAvg(dm.map(function(x){return x.mc}),MA_N),C.s2,2)]},
+ options:{scales:axes(" %"),plugins:{legend:LEG,tooltip:Object.assign({},TT,{callbacks:{label:pct}})}}});
+}
+
+/* ───────── Tooltip para bloques HTML ───────── */
+var tip=document.getElementById("tip");
+document.addEventListener("mouseover",function(e){var t=e.target.closest&&e.target.closest("[data-tip]");if(!t){tip.style.opacity=0;return}tip.innerHTML=t.getAttribute("data-tip");tip.style.opacity=1});
+document.addEventListener("mousemove",function(e){if(tip.style.opacity==="0")return;var x=e.clientX+14,y=e.clientY+14,w=tip.offsetWidth,h=tip.offsetHeight;
+if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+h>innerHeight-8)y=e.clientY-h-14;tip.style.left=x+"px";tip.style.top=y+"px"});
 
 window.onS=function(v){curSeason=v;applyFilters()};
 window.onE=function(v){curEmision=v;applyFilters()};
-window.onD=function(v){curDemo=v;applyFilters()};
-
-function parseCSVLine(line) {
-  var result = [], current = "", inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    var c = line[i];
-    if (inQuotes) {
-      if (c === '"' && line[i + 1] === '"') { current += '"'; i++; }
-      else if (c === '"') { inQuotes = false; }
-      else { current += c; }
-    } else {
-      if (c === '"') { inQuotes = true; }
-      else if (c === ',') { result.push(current.trim()); current = ""; }
-      else { current += c; }
-    }
-  }
-  result.push(current.trim());
-  return result;
-}
+window.toggleLoc=function(){showAllLoc=!showAllLoc;render()};
 
 function loadData(){showLoad();
 fetch(DATA_URL).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.text()}).then(function(text){
@@ -192,7 +375,7 @@ var hdr=parseCSVLine(lines[0]);
 var rows=[];for(var i=1;i<lines.length;i++){var vals=parseCSVLine(lines[i]);var row={};for(var j=0;j<hdr.length;j++)row[hdr[j]]=vals[j]||"";rows.push(row)}
 rawCount=rows.length;allData=proc(rows);
 var seen={};for(var i=0;i<allData.length;i++)seen[allData[i].season]=true;
-allSeasons=Object.keys(seen).sort();loadTs=new Date();curSeason="all";curEmision="ORIGINAL";curDemo="none";applyFilters()}).catch(function(e){showErr(e.message)})}
+allSeasons=Object.keys(seen).sort();loadTs=new Date();applyFilters()}).catch(function(e){showErr(e.message)})}
 loadData();
 </script>
 </body>
