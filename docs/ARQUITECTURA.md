@@ -42,7 +42,7 @@ Dashboard (index.html en Vercel)  ── filtro por defecto "Originales" = AA ==
 |---|---|---|
 | A–U | PROGRAMA … MURCIA CONECTA | Script (datos del PDF) |
 | V | Nº PROGRAMA (`5x04`) | Script (nombre de la carpeta de Drive) |
-| W | PUBLICO | Script (celda I3 de la escaleta) — **roto en T5**, ver pendientes |
+| W | PUBLICO | Script, desde la tabla de Notion **PÚBLICO DIARIO** (por Nº PROGRAMA). Varios grupos: `LORCA / AILOVERS` |
 | X, Y | EMISIÓN, ESTADISTICAS | Antiguas, el script ya no las escribe |
 | AA | TIPO | **Fórmula de la hoja**: ORIGINAL si V tiene valor, si no REPETIDO |
 | AB, AC | EST_CALCU, Nº ABSOLUTO | Fórmulas/manual |
@@ -60,6 +60,7 @@ Dashboard (index.html en Vercel)  ── filtro por defecto "Originales" = AA ==
 | Archivo | Qué hace |
 |---|---|
 | `Código` | **Importador diario.** `importarDiario_core()`: limpieza única → busca PDF en Gmail → OCR → inserta fila → rellena V/W desde Drive → reintenta V/W de filas recientes vacías. |
+| `notion` | Lectura de la tabla de Notion **PÚBLICO DIARIO** (ID `1883d3b1e047473088282586d27388f4`): `PGM_TEXTO` (5x14) → `LOCALIDAD_PUBLICO`. Si no hay localidad pero alguna columna dice AILOVERS → `AILOVERS`. Varios grupos → todos, separados por ` / ` (primero CONFIRMADO, luego más PAX). El secreto va en Propiedades de la secuencia de comandos: `NOTION_TOKEN`. `notionInspeccionar` y `notionPreviewPublicos` son de solo lectura. |
 | `core` | Redefine `importarDiario()` (es la que ejecuta el disparador) y solo llama a `importarDiario_core()` de `Código`. Su enriquecimiento propio está comentado. |
 | `Dashboard` + `DashboardUI` | Dashboard antiguo como web app de Apps Script (`doGet`, `?mode=data` devuelve JSON). |
 | `traer pgm` | `construirCatalogoProgramas()`: catálogo de programas desde las escaletas (T1–T4). |
@@ -81,7 +82,7 @@ Dashboard (index.html en Vercel)  ── filtro por defecto "Originales" = AA ==
 
 - Nombre: `PGM_<temporada>X<número> DDMMYY`, por ejemplo `PGM_5X001 280926` → `5x01`.
 - Se buscan **por día y mes** dentro de la carpeta de la temporada. Así toleran años mal escritos (p. ej. `PGM_5X024 301029`).
-- Dentro está la escaleta (hoja de cálculo); el público se lee de la celda `I3`.
+- Dentro está la escaleta (hoja de cálculo). Hasta la T4 el público se leía de su celda `I3`; desde marzo de 2026 sale de Notion.
 
 ### Mantenimiento
 
@@ -111,8 +112,13 @@ Dashboard (index.html en Vercel)  ── filtro por defecto "Originales" = AA ==
 
 **Validación:** la lógica nueva da los mismos Nº PROGRAMA que ya había en las 245 filas de la T4. Resultado: T26/27 con 16 emisiones, 14 originales (`5x01`–`5x14`), sin días duplicados.
 
+### 19/10/2026 — PUBLICO desde Notion
+
+Las escaletas cambiaron de formato y la celda I3 dejó de tener el público (vacío desde 4x87, marzo 2026). Ahora el importador lo saca de Notion y en cada ejecución rellena las filas con Nº PROGRAMA y PUBLICO vacío (solo celdas vacías). El dashboard reparte una emisión `A / B` entre las dos localidades en el ranking.
+
 ## Pendientes
 
-- **PUBLICO (W) vacío en toda la T5:** se cambió el formato de las escaletas y el público ya no está en `I3`. Hay que ajustar `PUBLIC_CELL` o la lectura de la escaleta en `Código`.
+- Corregir en Notion localidades mal escritas (`ACANTARILLA`) o genéricas (`VARIOS`, `ALMERIA GENERAL`). El 5x01 no tiene localidad en Notion.
+- Los PUBLICO antiguos (T1–T4) mezclan varias localidades con comas sin criterio fijo; solo las nuevas usan ` / `.
 - Renombrar las carpetas `PGM_5X024`–`PGM_5X029`, que tienen el año mal escrito (`…1029` / `…1129`). El script ya las encuentra, pero conviene corregirlas.
 - Opcional: limpiar los scripts sueltos y los nombres de función duplicados del proyecto de Apps Script.

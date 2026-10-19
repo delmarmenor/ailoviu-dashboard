@@ -274,7 +274,8 @@ return out}
 return block("Sexo y edad",G)+'<div style="height:14px"></div>'+block("Tamaño del municipio",H)+'<div class="legend"><span><i style="background:var(--s1)"></i>Share medio del grupo</span><span><i class="tick"></i>Share total</span></div>'}
 
 function locTable(d,ref){
-var g={};d.forEach(function(x){if(!x.pub)return;(g[x.pub]=g[x.pub]||[]).push(x)});
+// "LORCA / AILOVERS" = varios grupos de público: la emisión cuenta para cada uno
+var g={};d.forEach(function(x){if(!x.pub)return;x.pub.split(/\s+\/\s+/).forEach(function(p){p=p.trim();if(p)(g[p]=g[p]||[]).push(x)})});
 var rows=Object.keys(g).map(function(k){var a=g[k];return{l:titleCase(k),n:a.length,sh:avg(a.map(function(x){return x.share})),au:avg(a.map(function(x){return x.aud})),last:a[a.length-1].date}})
 .filter(function(r){return r.n>=2&&r.sh!=null}).sort(function(a,b){return b.sh-a.sh});
 if(!rows.length)return'<div class="cnote">No hay localidades con al menos 2 emisiones en este periodo. (La temporada 26/27 todavía no tiene la columna PUBLICO rellena.)</div>';
